@@ -14,6 +14,7 @@ export default function App() {
 	const [pageSize, setPageSize] = useState<number>(10);
 	const [totalCount, setTotalCount] = useState<number>(0);
 	const [filters, setFilters] = useState<ListingFilters>({});
+	const [debouncedFilters, setDebouncedFilters] = useState<ListingFilters>(filters);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const [showCreateForm, setShowCreateForm] = useState(false);
 	const [loading, setLoading] = useState(true);
@@ -21,18 +22,24 @@ export default function App() {
 
 	useEffect(() => {
 		setLoading(true);
-		getListings({ page, pageSize, ...filters })
+		getListings({ page, pageSize, ...debouncedFilters })
 			.then((data) => {
 				setListings(data.listings);
 				setTotalCount(data.totalCount ?? 0);
 			})
 			.catch((err) =>
 				setError(
-						err instanceof Error ? err.message : "Failed to load listings",
-					),
+							err instanceof Error ? err.message : "Failed to load listings",
+						),
 				)
 			.finally(() => setLoading(false));
-	}, [page, pageSize, filters]);
+	}, [page, pageSize, debouncedFilters]);
+
+	// Debounce filter changes to avoid rapid API calls while typing
+	useEffect(() => {
+		const t = setTimeout(() => setDebouncedFilters(filters), 400);
+		return () => clearTimeout(t);
+	}, [filters]);
 
 	const selectedListing = listings.find((l) => l.id === selectedId) ?? null;
 
