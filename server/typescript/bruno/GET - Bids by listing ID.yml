@@ -5,7 +5,11 @@ info:
 
 http:
   method: GET
-  url: http://localhost:3001/api/listings/a1b2c3d4-0004-4000-8000-ef1234567890/bids
+  url: http://localhost:3001/api/listings/:listingId/bids
+  params:
+    - name: listingId
+      value: a1b2c3d4-0004-4000-8000-ef1234567890
+      type: path
   auth: inherit
 
 settings:

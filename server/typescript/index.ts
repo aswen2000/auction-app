@@ -65,8 +65,37 @@ app.use(cors({ origin: "http://localhost:5173" }));
 app.use(express.json());
 
 // GET /api/listings
-app.get("/api/listings", (_req: Request, res: Response) => {
-	res.json(listings);
+app.get("/api/listings", (req: Request, res: Response) => {
+	const paginationSchema = z.object({
+		page: z.preprocess((val) => {
+			if (val === undefined) return undefined;
+			return Number(val);
+		}, z.number().int().positive().default(1)),
+		pageSize: z.preprocess((val) => {
+			if (val === undefined) return undefined;
+			return Number(val);
+		}, z.number().int().positive().max(100).default(10)),
+	});
+
+	const parse = paginationSchema.safeParse(req.query);
+	if (!parse.success) {
+		return res.status(400).json({ error: "Invalid pagination parameters" });
+	}
+
+	const { page, pageSize } = parse.data;
+
+	const totalCount = listings.length;
+	const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+	const start = (page - 1) * pageSize;
+	const paged = listings.slice(start, start + pageSize);
+
+	return res.json({
+		listings: paged,
+		page,
+		pageSize,
+		totalCount,
+		totalPages,
+	});
 });
 
 // POST /api/listings
