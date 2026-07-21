@@ -15,13 +15,14 @@ export default function Pagination({ page, pageSize, onPageChange, onPageSizeCha
             style={{
                 width: "100%",
                 display: "flex",
-                alignItems: "center",
+                flexDirection: "column",
+                gap: 8,
                 marginTop: 12,
             }}
         >
-            <div style={{ flex: 1 }} />
+            <div style={{ display: "flex", alignItems: "center" }}>
+                <div style={{ flex: 1 }} />
 
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <button
                     type="button"
                     onClick={() => onPageChange(Math.max(1, page - 1))}
@@ -30,7 +31,7 @@ export default function Pagination({ page, pageSize, onPageChange, onPageSizeCha
                     Previous
                 </button>
 
-                <div className="pagination__info">
+                <div className="pagination__info" style={{ margin: "0 12px" }}>
                     {totalPages ? (
                         <span>Page {page} of {totalPages}</span>
                     ) : (
@@ -45,9 +46,9 @@ export default function Pagination({ page, pageSize, onPageChange, onPageSizeCha
                 >
                     Next
                 </button>
-            </div>
 
-            <div style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
+                <div style={{ flex: 1 }} />
+
                 <label>
                     Items:
                     <select
@@ -66,6 +67,14 @@ export default function Pagination({ page, pageSize, onPageChange, onPageSizeCha
                     </select>
                 </label>
             </div>
+
+            {totalCount !== undefined && (
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <span>
+                        Total records: {totalCount}
+                    </span>
+                </div>
+            )}
         </div>
     );
 }
