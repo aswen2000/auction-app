@@ -94,5 +94,41 @@
 		"status": "closed",
 		"endsAt": "2026-04-05T12:00:00.000Z",
 		"imageUrl": "https://placehold.co/400x300?text=2016+MacDon+FD75+Draper+Header"
+	},
+	{
+		"id": "a1b2c3d4-0003-6700-8000-ef1234567890",
+		"title": "2018 Kubota SVL75-2 Skid Steer",
+		"description": "Compact track loader with 74.3 hp Kubota diesel engine. High-flow hydraulics, enclosed cab with A/C, 2,690 lb rated operating capacity. 1,100 hours.",
+		"category": "implement",
+		"startingPrice": 45000,
+		"currentBid": 45000,
+		"currentBidder": null,
+		"status": "active",
+		"endsAt": "2026-04-13T12:00:00.000Z",
+		"imageUrl": "https://placehold.co/400x300?text=2018+Kubota+SVL75-2+Skid+Steer"
+	},
+	{
+		"id": "a1b2c3d4-0004-5946-8000-ef1234567890",
+		"title": "2020 Kinze 1050 Grain Cart",
+		"description": "1,050 bushel grain cart with 21\" auger, scale system, and hydraulic spout rotation. Tandem axle, road lights, and grain level sight window. Excellent shape.",
+		"category": "implement",
+		"startingPrice": 28000,
+		"currentBid": 28000,
+		"currentBidder": null,
+		"status": "closed",
+		"endsAt": "2026-04-08T12:00:00.000Z",
+		"imageUrl": "https://placehold.co/400x300?text=2020+Kinze+1050+Grain+Cart"
+	},
+	{
+		"id": "a1b2c3d4-0005-3264-8000-ef1234567890",
+		"title": "Frontier RC2060 Rotary Cutter",
+		"description": "5-foot rotary cutter compatible with Cat 1 three-point hitch. Shear bolt slip clutch, 6-gauge deck, and 25 hp gearbox. Lightly used, great for pasture maintenance.",
+		"category": "attachment",
+		"startingPrice": 4200,
+		"currentBid": 4200,
+		"currentBidder": null,
+		"status": "pending",
+		"endsAt": "2026-04-15T12:00:00.000Z",
+		"imageUrl": "https://placehold.co/400x300?text=Frontier+RC2060+Rotary+Cutter"
 	}
 ]

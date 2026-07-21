@@ -10,3 +10,12 @@ export interface Listing {
 	endsAt: string;
 	imageUrl: string;
 }
+
+export interface ListingFilters {
+	category?: Listing["category"];
+	status?: Listing["status"];
+	startingPriceMin?: number;
+	startingPriceMax?: number;
+	currentBidMin?: number;
+	currentBidMax?: number;
+}

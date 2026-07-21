@@ -4,24 +4,35 @@ import CreateListingForm from "./components/CreateListingForm";
 import ListingCard from "./components/ListingCard";
 import ListingDetail from "./components/ListingDetail";
 import type { Listing } from "./types";
+import Pagination from "./components/Pagination";
+import FilterBar from "./components/FilterBar";
+import type { ListingFilters } from "./types";
 
 export default function App() {
 	const [listings, setListings] = useState<Listing[]>([]);
+	const [page, setPage] = useState<number>(1);
+	const [pageSize, setPageSize] = useState<number>(10);
+	const [totalCount, setTotalCount] = useState<number>(0);
+	const [filters, setFilters] = useState<ListingFilters>({});
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const [showCreateForm, setShowCreateForm] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		getListings()
-			.then((data) => setListings(data))
+		setLoading(true);
+		getListings({ page, pageSize, ...filters })
+			.then((data) => {
+				setListings(data.listings);
+				setTotalCount(data.totalCount ?? 0);
+			})
 			.catch((err) =>
 				setError(
-					err instanceof Error ? err.message : "Failed to load listings",
-				),
-			)
+						err instanceof Error ? err.message : "Failed to load listings",
+					),
+				)
 			.finally(() => setLoading(false));
-	}, []);
+	}, [page, pageSize, filters]);
 
 	const selectedListing = listings.find((l) => l.id === selectedId) ?? null;
 
@@ -61,17 +72,41 @@ export default function App() {
 						<div className="state-message state-message--error">{error}</div>
 					)}
 					{!loading && !error && (
-						<div className="listing-grid">
-							{listings.map((listing) => (
-								<ListingCard
-									key={listing.id}
-									listing={listing}
-									isSelected={listing.id === selectedId}
-									onClick={() => setSelectedId(listing.id)}
-								/>
-							))}
-						</div>
-					)}
+						<>
+							<FilterBar 
+								filters={filters} 
+								onChange={(f) => {
+									setFilters(f);
+									setPage(1);
+								}} 
+								onClear={() => { 
+									setFilters({});
+									setPage(1);
+								}} 
+							/>
+							<div className="listing-grid">
+								{listings.map((listing) => (
+									<ListingCard
+										key={listing.id}
+										listing={listing}
+										isSelected={listing.id === selectedId}
+										onClick={() => setSelectedId(listing.id)}
+									/>
+								))}
+							</div>
+
+							<Pagination
+								page={page}
+								pageSize={pageSize}
+								onPageChange={(p) => setPage(p)}
+								onPageSizeChange={(s) => {
+									setPageSize(s);
+									setPage(1);
+								}}
+								totalCount={totalCount}
+							/>
+						</>
+						)}
 				</aside>
 				<main className="panel panel--right">
 					{showCreateForm ? (
