@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { ListingFilters } from "../types";
 
 interface Props {
@@ -9,11 +9,20 @@ interface Props {
 
 export default function FilterBar({ filters, onChange, onClear }: Props) {
     const [local, setLocal] = useState<ListingFilters>(filters ?? {});
+    const isSyncingFromProps = useRef(false);
 
-    useEffect(() => setLocal(filters ?? {}), [filters]);
+    useEffect(() => {
+        isSyncingFromProps.current = true;
+        setLocal(filters ?? {});
+    }, [filters]);
 
     // debounce updates
     useEffect(() => {
+        // Skip calling onChange if we just synced from props
+        if (isSyncingFromProps.current) {
+            isSyncingFromProps.current = false;
+            return;
+        }
         const t = setTimeout(() => onChange(local), 500);
         return () => clearTimeout(t);
     }, [local, onChange]);
