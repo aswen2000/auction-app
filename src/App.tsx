@@ -5,12 +5,15 @@ import ListingCard from "./components/ListingCard";
 import ListingDetail from "./components/ListingDetail";
 import type { Listing } from "./types";
 import Pagination from "./components/Pagination";
+import FilterBar from "./components/FilterBar";
+import type { ListingFilters } from "./types";
 
 export default function App() {
 	const [listings, setListings] = useState<Listing[]>([]);
 	const [page, setPage] = useState<number>(1);
 	const [pageSize, setPageSize] = useState<number>(10);
 	const [totalCount, setTotalCount] = useState<number>(0);
+	const [filters, setFilters] = useState<ListingFilters>({});
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const [showCreateForm, setShowCreateForm] = useState(false);
 	const [loading, setLoading] = useState(true);
@@ -18,7 +21,7 @@ export default function App() {
 
 	useEffect(() => {
 		setLoading(true);
-		getListings(page, pageSize)
+		getListings({ page, pageSize, ...filters })
 			.then((data) => {
 				setListings(data.listings);
 				setTotalCount(data.totalCount ?? 0);
@@ -29,7 +32,7 @@ export default function App() {
 					),
 				)
 			.finally(() => setLoading(false));
-	}, [page, pageSize]);
+	}, [page, pageSize, filters]);
 
 	const selectedListing = listings.find((l) => l.id === selectedId) ?? null;
 
@@ -70,6 +73,17 @@ export default function App() {
 					)}
 					{!loading && !error && (
 						<>
+							<FilterBar 
+								filters={filters} 
+								onChange={(f) => {
+									setFilters(f);
+									setPage(1);
+								}} 
+								onClear={() => { 
+									setFilters({});
+									setPage(1);
+								}} 
+							/>
 							<div className="listing-grid">
 								{listings.map((listing) => (
 									<ListingCard

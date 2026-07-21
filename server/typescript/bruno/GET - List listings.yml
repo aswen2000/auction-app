@@ -5,14 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:5173/api/listings?page=1&pageSize=5
-  params:
-    - name: page
-      value: "1"
-      type: query
-    - name: pageSize
-      value: "5"
-      type: query
+  url: http://localhost:5173/api/listings
   auth: inherit
 
 settings:

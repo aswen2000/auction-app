@@ -1,4 +1,4 @@
-import type { Listing } from "../types";
+import type { Listing, ListingFilters } from "../types";
 
 export interface ListingsResponse {
 	listings: Listing[];
@@ -8,12 +8,25 @@ export interface ListingsResponse {
 	totalPages: number;
 }
 
-export async function getListings(page = 1, pageSize = 10): Promise<ListingsResponse> {
-	const params = new URLSearchParams();
-	params.set("page", String(page));
-	params.set("pageSize", String(pageSize));
+export interface GetListingsOptions extends Partial<ListingFilters> {
+	page?: number;
+	pageSize?: number;
+}
 
-	const res = await fetch(`/api/listings?${params.toString()}`);
+export async function getListings(opts: GetListingsOptions = {}): Promise<ListingsResponse> {
+	const { page = 1, pageSize = 10, ...rest } = opts;
+
+	const paramsObj: Record<string, string> = {
+		page: String(page),
+		pageSize: String(pageSize),
+		...Object.fromEntries(
+			Object.entries(rest)
+				.filter(([, v]) => v !== undefined)
+				.map(([k, v]) => [k, String(v)]),
+		),
+	};
+
+	const res = await fetch(`/api/listings?${new URLSearchParams(paramsObj).toString()}`);
 	if (!res.ok) throw new Error("Failed to fetch listings");
 	return res.json();
 }

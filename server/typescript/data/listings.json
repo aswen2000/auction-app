@@ -115,7 +115,7 @@
 		"startingPrice": 28000,
 		"currentBid": 28000,
 		"currentBidder": null,
-		"status": "active",
+		"status": "closed",
 		"endsAt": "2026-04-08T12:00:00.000Z",
 		"imageUrl": "https://placehold.co/400x300?text=2020+Kinze+1050+Grain+Cart"
 	},
@@ -127,7 +127,7 @@
 		"startingPrice": 4200,
 		"currentBid": 4200,
 		"currentBidder": null,
-		"status": "active",
+		"status": "pending",
 		"endsAt": "2026-04-15T12:00:00.000Z",
 		"imageUrl": "https://placehold.co/400x300?text=Frontier+RC2060+Rotary+Cutter"
 	}

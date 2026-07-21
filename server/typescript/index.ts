@@ -67,27 +67,39 @@ app.use(express.json());
 // GET /api/listings
 app.get("/api/listings", (req: Request, res: Response) => {
 	const paginationSchema = z.object({
-		page: z.preprocess((val) => {
-			if (val === undefined) return undefined;
-			return Number(val);
-		}, z.number().int().positive().default(1)),
-		pageSize: z.preprocess((val) => {
-			if (val === undefined) return undefined;
-			return Number(val);
-		}, z.number().int().positive().max(100).default(10)),
+		page: z.preprocess((val) => (val === undefined ? undefined : Number(val)), z.number().int().positive().default(1)),
+		pageSize: z.preprocess((val) => (val === undefined ? undefined : Number(val)), z.number().int().positive().max(100).default(10)),
+		category: z.enum(["tractor", "combine", "implement", "attachment"]).optional(),
+		status: z.enum(["active", "closed", "pending"]).optional(),
+		startingPriceMin: z.preprocess((val) => (val === undefined ? undefined : Number(val)), z.number().nonnegative().optional()),
+		startingPriceMax: z.preprocess((val) => (val === undefined ? undefined : Number(val)), z.number().nonnegative().optional()),
+		currentBidMin: z.preprocess((val) => (val === undefined ? undefined : Number(val)), z.number().nonnegative().optional()),
+		currentBidMax: z.preprocess((val) => (val === undefined ? undefined : Number(val)), z.number().nonnegative().optional()),
 	});
 
-	const parse = paginationSchema.safeParse(req.query);
-	if (!parse.success) {
-		return res.status(400).json({ error: "Invalid pagination parameters" });
+	const parsedResult = paginationSchema.safeParse(req.query);
+	if (!parsedResult.success) {
+		const formattedErrors = z.flattenError(parsedResult.error);
+		return res.status(400).json({ error: "Invalid parameters", details: formattedErrors });
 	}
 
-	const { page, pageSize } = parse.data;
+	const { page, pageSize, category, status, startingPriceMin, startingPriceMax, currentBidMin, currentBidMax } = parsedResult.data;
 
-	const totalCount = listings.length;
+	// Apply filters before pagination, would all be SQL queries in a real db
+	const filtered = listings.filter((l) => {
+		if (category && l.category !== category) return false;
+		if (status && l.status !== status) return false;
+		if (startingPriceMin !== undefined && l.startingPrice < startingPriceMin) return false;
+		if (startingPriceMax !== undefined && l.startingPrice > startingPriceMax) return false;
+		if (currentBidMin !== undefined && l.currentBid < currentBidMin) return false;
+		if (currentBidMax !== undefined && l.currentBid > currentBidMax) return false;
+		return true;
+	});
+
+	const totalCount = filtered.length;
 	const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 	const start = (page - 1) * pageSize;
-	const paged = listings.slice(start, start + pageSize);
+	const paged = filtered.slice(start, start + pageSize);
 
 	return res.json({
 		listings: paged,
