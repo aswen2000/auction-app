@@ -4,6 +4,7 @@ import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
 import express, { type Request, type Response } from "express";
+import { z } from "zod";
 
 const PORT = 3001;
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -33,6 +34,13 @@ interface BidRequest {
 	amount: number;
 }
 
+interface BidRecord {
+	listingId: string;
+	bidder: string;
+	amount: number;
+	placedAt: string;
+}
+
 interface CreateListingRequest {
 	title: string;
 }
@@ -44,6 +52,8 @@ interface CreateListingRequest {
 const listings: Listing[] = JSON.parse(
 	readFileSync(join(__dirname, "data", "listings.json"), "utf-8"),
 );
+
+const bids: Record<string, BidRecord[]> = {};
 
 // ============================================================
 // App
@@ -108,6 +118,7 @@ app.post("/api/listings/:id/bids", (req: Request, res: Response) => {
 
 	const bid = req.body as BidRequest;
 
+	// TODO: Out of scope for now, but would rather have middleware with Zod
 	if (
 		!bid.bidder ||
 		typeof bid.bidder !== "string" ||
@@ -131,7 +142,31 @@ app.post("/api/listings/:id/bids", (req: Request, res: Response) => {
 	listing.currentBid = bid.amount;
 	listing.currentBidder = bid.bidder.trim();
 
+	bids[listing.id] = bids[listing.id] || [];
+	bids[listing.id].push({
+		listingId: listing.id,
+		bidder: bid.bidder.trim(),
+		amount: bid.amount,
+		placedAt: new Date().toISOString(),
+	});
+
 	return res.status(201).json(listing);
+});
+
+// GET /api/listings/:id/bids
+app.get("/api/listings/:id/bids", (req: Request, res: Response) => {
+	if (!z.uuid().safeParse(req.params.id).success) {
+		return res.status(400).json({ error: "Listing ID must be a UUID" });
+	}
+
+	if (!listings.find((l) => l.id === req.params.id)) {
+		return res.status(404).json({ error: "Listing not found" });
+	}
+
+	// Would be SQL query sorted by placedAt DESC in a real db
+	const listingBids = (bids[req.params.id] ?? []).sort((a, b) => new Date(b.placedAt).getTime() - new Date(a.placedAt).getTime());
+
+	return res.json(listingBids);
 });
 
 app.listen(PORT, () => {
