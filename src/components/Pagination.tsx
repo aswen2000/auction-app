@@ -1,4 +1,4 @@
-interface Props {
+interface PaginationProps {
     page: number;
     pageSize: number;
     onPageChange: (newPage: number) => void;
@@ -6,7 +6,7 @@ interface Props {
     totalCount?: number;
 }
 
-export default function Pagination({ page, pageSize, onPageChange, onPageSizeChange, totalCount }: Props) {
+export default function Pagination({ page, pageSize, onPageChange, onPageSizeChange, totalCount }: PaginationProps) {
     const totalPages = totalCount ? Math.max(1, Math.ceil(totalCount / pageSize)) : undefined;
 
     return (

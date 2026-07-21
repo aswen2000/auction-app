@@ -1,22 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import type { ListingFilters } from "../types";
 
-interface Props {
+interface FilterBarProps {
     filters: ListingFilters;
     onChange: (f: ListingFilters) => void;
     onClear?: () => void;
 }
 
-export default function FilterBar({ filters, onChange, onClear }: Props) {
-    const [local, setLocal] = useState<ListingFilters>(filters ?? {});
+export default function FilterBar({ filters, onChange, onClear }: FilterBarProps) {
+    const safe = filters ?? {};
 
-    useEffect(() => setLocal(filters ?? {}), [filters]);
-
-    // debounce updates
-    useEffect(() => {
-        const t = setTimeout(() => onChange(local), 500);
-        return () => clearTimeout(t);
-    }, [local, onChange]);
+    const update = (patch: Partial<ListingFilters>) => {
+        onChange({ ...safe, ...patch });
+    };
 
     return (
         <div className="filter-bar" style={{ marginBottom: 12 }}>
@@ -24,8 +20,8 @@ export default function FilterBar({ filters, onChange, onClear }: Props) {
                 <label>
                     Category
                     <select
-                        value={local.category ?? ""}
-                        onChange={(e) => setLocal(s => ({ ...s, category: e.target.value ? (e.target.value as ListingFilters['category']) : undefined }))}
+                        value={safe.category ?? ""}
+                        onChange={(e) => update({ category: e.target.value ? (e.target.value as ListingFilters['category']) : undefined })}
                         style={{ marginLeft: 6 }}
                     >
                         <option value="">All</option>
@@ -41,8 +37,8 @@ export default function FilterBar({ filters, onChange, onClear }: Props) {
                 <label>
                     Status
                     <select
-                        value={local.status ?? ""}
-                        onChange={(e) => setLocal(s => ({ ...s, status: e.target.value ? (e.target.value as ListingFilters['status']) : undefined }))}
+                        value={safe.status ?? ""}
+                        onChange={(e) => update({ status: e.target.value ? (e.target.value as ListingFilters['status']) : undefined })}
                         style={{ marginLeft: 6 }}
                     >
                         <option value="">All</option>
@@ -58,8 +54,8 @@ export default function FilterBar({ filters, onChange, onClear }: Props) {
                     Start Price Min
                     <input
                         type="number"
-                        value={local.startingPriceMin ?? ""}
-                        onChange={(e) => setLocal((s) => ({ ...s, startingPriceMin: e.target.value === "" ? undefined : Number(e.target.value) }))}
+                        value={safe.startingPriceMin ?? ""}
+                        onChange={(e) => update({ startingPriceMin: e.target.value === "" ? undefined : Number(e.target.value) })}
                         style={{ marginLeft: 6, width: 120 }}
                     />
                 </label>
@@ -68,8 +64,8 @@ export default function FilterBar({ filters, onChange, onClear }: Props) {
                     Start Price Max
                     <input
                         type="number"
-                        value={local.startingPriceMax ?? ""}
-                        onChange={(e) => setLocal((s) => ({ ...s, startingPriceMax: e.target.value === "" ? undefined : Number(e.target.value) }))}
+                        value={safe.startingPriceMax ?? ""}
+                        onChange={(e) => update({ startingPriceMax: e.target.value === "" ? undefined : Number(e.target.value) })}
                         style={{ marginLeft: 6, width: 120 }}
                     />
                 </label>
@@ -80,8 +76,8 @@ export default function FilterBar({ filters, onChange, onClear }: Props) {
                     Current Bid Min
                     <input
                         type="number"
-                        value={local.currentBidMin ?? ""}
-                        onChange={(e) => setLocal((s) => ({ ...s, currentBidMin: e.target.value === "" ? undefined : Number(e.target.value) }))}
+                        value={safe.currentBidMin ?? ""}
+                        onChange={(e) => update({ currentBidMin: e.target.value === "" ? undefined : Number(e.target.value) })}
                         style={{ marginLeft: 6, width: 120 }}
                     />
                 </label>
@@ -90,15 +86,15 @@ export default function FilterBar({ filters, onChange, onClear }: Props) {
                     Current Bid Max
                     <input
                         type="number"
-                        value={local.currentBidMax ?? ""}
-                        onChange={(e) => setLocal((s) => ({ ...s, currentBidMax: e.target.value === "" ? undefined : Number(e.target.value) }))}
+                        value={safe.currentBidMax ?? ""}
+                        onChange={(e) => update({ currentBidMax: e.target.value === "" ? undefined : Number(e.target.value) })}
                         style={{ marginLeft: 6, width: 120 }}
                     />
                 </label>
             </div>
 
             <div>
-                <button type="button" onClick={() => { setLocal({}); onClear?.(); }}>
+                <button type="button" onClick={() => onClear?.()}>
                     Clear
                 </button>
             </div>
